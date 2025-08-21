@@ -27,7 +27,7 @@ public class TranslationController {
     @PostMapping("/translate")
     public ResponseEntity<?> translateText(
             @RequestParam String text,   // Text cần dịch
-            @RequestParam String to      // Ngôn ngữ đích (ví dụ: "vi" cho tiếng Việt)
+            @RequestParam String to,      // Ngôn ngữ đích (ví dụ: "vi" cho tiếng Việt)
             @RequestParam(required = false) String from
     ) {
         try {
