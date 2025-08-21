@@ -23,46 +23,39 @@ public class TranslationController {
     @Value("${TRANSLATOR_ENDPOINT}")
     private String endpoint;             // Endpoint API
 
-    // Định nghĩa endpoint POST /api/translate
     @PostMapping("/translate")
     public ResponseEntity<?> translateText(
-            @RequestParam String text,   // Text cần dịch
-            @RequestParam String to,      // Ngôn ngữ đích (ví dụ: "vi" cho tiếng Việt)
-            @RequestParam(required = false) String from
+            @RequestBody Map<String, String> body // Nhận JSON body
     ) {
         try {
-            // Tạo URL đầy đủ cho API Microsoft Translator
+            String text = body.get("text");  // lấy text
+            String to = body.get("to");      // lấy ngôn ngữ đích
+            String from = body.get("from");  // có thể null
+    
+            // Tạo URL cho Microsoft Translator
             String url = endpoint + "/translate?api-version=3.0&to=" + to + "&includeAlignment=true";
-
+    
             if (from != null && !from.isEmpty()) {
                 url += "&from=" + from;
             }
-
-            // Tạo headers HTTP
+    
+            // Tạo headers
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);       // Content-Type = application/json
-            headers.set("Ocp-Apim-Subscription-Key", apiKey);        // Key API
-            headers.set("Ocp-Apim-Subscription-Region", region);     // Region của key
-
-            // Tạo body JSON theo format mà Microsoft Translator yêu cầu
-            // Body là List<Map> vì API nhận mảng JSON với mỗi phần tử có key "Text"
-            List<Map<String, String>> body = Collections.singletonList(
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Ocp-Apim-Subscription-Key", apiKey);
+            headers.set("Ocp-Apim-Subscription-Region", region);
+    
+            // Body JSON cho Microsoft API
+            List<Map<String, String>> msBody = Collections.singletonList(
                     Collections.singletonMap("Text", text)
             );
-
-            // Gói headers + body thành HttpEntity để gửi đi
-            HttpEntity<List<Map<String, String>>> entity = new HttpEntity<>(body, headers);
-
-            // Tạo RestTemplate để gửi HTTP request
+    
+            HttpEntity<List<Map<String, String>>> entity = new HttpEntity<>(msBody, headers);
             RestTemplate restTemplate = new RestTemplate();
-
-            // Gửi POST request tới API và nhận response dạng Object
             ResponseEntity<Object> response = restTemplate.postForEntity(url, entity, Object.class);
-
-            // Trả thẳng response body về client với HTTP 200 OK
+    
             return ResponseEntity.ok(response.getBody());
         } catch (Exception e) {
-            // Nếu có lỗi, trả HTTP 500 kèm thông báo lỗi dạng JSON
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("error", e.getMessage()));
         }
