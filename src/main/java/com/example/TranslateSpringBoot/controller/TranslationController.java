@@ -28,10 +28,15 @@ public class TranslationController {
     public ResponseEntity<?> translateText(
             @RequestParam String text,   // Text cần dịch
             @RequestParam String to      // Ngôn ngữ đích (ví dụ: "vi" cho tiếng Việt)
+            @RequestParam(required = false) String from
     ) {
         try {
             // Tạo URL đầy đủ cho API Microsoft Translator
-            String url = endpoint + "/translate?api-version=3.0&to=" + to;
+            String url = endpoint + "/translate?api-version=3.0&to=" + to + "&includeAlignment=true";
+
+            if (from != null && !from.isEmpty()) {
+                url += "&from=" + from;
+            }
 
             // Tạo headers HTTP
             HttpHeaders headers = new HttpHeaders();
