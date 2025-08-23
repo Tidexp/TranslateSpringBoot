@@ -49,7 +49,13 @@ public class TranslationController {
             String translatedText = (String) translations.get("text");
             String detectedLang = bodyRes.get(0).containsKey("detectedLanguage") ? (String) ((Map)bodyRes.get(0).get("detectedLanguage")).get("language") : null;
     
-            String alignment = translations.containsKey("alignment") ? (String) translations.get("alignment") : null;
+            Object alignmentObj = translations.get("alignment");
+            String alignment = null;
+            
+            if (alignmentObj instanceof Map) {
+                Map<?, ?> alignmentMap = (Map<?, ?>) alignmentObj;
+                alignment = (String) alignmentMap.get("proj"); // lấy chuỗi proj
+            }
 
             Map<String, Object> result = new HashMap<>();
             result.put("translatedText", translatedText);
