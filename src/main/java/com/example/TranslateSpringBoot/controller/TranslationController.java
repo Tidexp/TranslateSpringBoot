@@ -49,10 +49,13 @@ public class TranslationController {
             String translatedText = (String) translations.get("text");
             String detectedLang = bodyRes.get(0).containsKey("detectedLanguage") ? (String) ((Map)bodyRes.get(0).get("detectedLanguage")).get("language") : null;
     
+            String alignment = translations.containsKey("alignment") ? (String) translations.get("alignment") : null;
+
             Map<String, Object> result = new HashMap<>();
             result.put("translatedText", translatedText);
             result.put("detectedLanguage", detectedLang);
-    
+            result.put("alignment", alignment);  // ✅ thêm dòng này
+            
             return ResponseEntity.ok(result);
     
         } catch (Exception e) {
